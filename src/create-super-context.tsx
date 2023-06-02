@@ -4,7 +4,7 @@ import React, {
   useContext,
   useCallback,
   useSyncExternalStore,
-	useMemo,
+  useMemo,
 } from "react";
 
 type SetActionArg<A> = Partial<A> | ((prevState: A) => A)
@@ -12,18 +12,20 @@ type SetActionArg<A> = Partial<A> | ((prevState: A) => A)
 type SetAction<T> = (value: SetActionArg<T>) => void
 
 type SetterFunctions<L extends Record<string, unknown>> = {
-  [K in keyof L as K extends string ? `set${Capitalize<K>}` : never]: (value: L[K] | ((prevState: L[K]) => L[K])) => void;
-};
+  [K in keyof L as K extends string ? `set${Capitalize<K>}` : never]: (
+    value: L[K] | ((prevState: L[K]) => L[K]),
+  ) => void
+}
 
-export default function createSuperContext<Store extends Record<string, unknown>>(initialState: Store) {
-	
+export default function createSuperContext<Store extends Record<string, unknown>>(
+  initialState: Store,
+) {
   function useStoreData(): {
-    get: () => Store;
-    set: SetAction<Store>;
-    subscribe: (callback: () => void) => () => void;
-		setters: SetterFunctions<Store>
+    get: () => Store
+    set: SetAction<Store>
+    subscribe: (callback: () => void) => () => void
+    setters: SetterFunctions<Store>
   } {
-
     const store = useRef(initialState);
 
     const get = useCallback(() => store.current, []);
@@ -32,41 +34,41 @@ export default function createSuperContext<Store extends Record<string, unknown>
 
     const handleUpdateSubscribers = () => {
       subscribers.current.forEach((callback) => callback());
-    }
-		
+    };
+
     const set = useCallback((...args: [SetActionArg<Store>]) => {
-			const [value] = args;
-			store.current = typeof value === "function" 
-        ? { ...store.current, ...value(store.current) }
-        : { ...store.current, ...value };
+      const [value] = args;
+      store.current =
+        typeof value === "function"
+          ? { ...store.current, ...value(store.current) }
+          : { ...store.current, ...value };
 
       handleUpdateSubscribers();
     }, []);
 
-		const createSetters = useCallback(<L extends Record<string, unknown>>(obj: L): SetterFunctions<L> => {
-      const setters = {} as SetterFunctions<L>;
-    
-      for (const key in obj) {
-        const capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
-        const setterKey = `set${capitalizedKey}` as keyof SetterFunctions<L>;
-        setters[setterKey] = ((value: L[keyof L]) => {
+    const createSetters = useCallback(
+      <L extends Record<string, unknown>>(obj: L): SetterFunctions<L> => {
+        const setters = {} as SetterFunctions<L>;
 
-          store.current = { 
-            ...store.current,
-            [key]: typeof value === "function"
-              ? value(store.current[key])
-              : value
-          } ;
+        for (const key in obj) {
+          const capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
+          const setterKey = `set${capitalizedKey}` as keyof SetterFunctions<L>;
+          setters[setterKey] = ((value: L[keyof L]) => {
+            store.current = {
+              ...store.current,
+              [key]: typeof value === "function" ? value(store.current[key]) : value,
+            };
 
-					handleUpdateSubscribers();
+            handleUpdateSubscribers();
+          }) as SetterFunctions<L>[keyof SetterFunctions<L>];
+        }
 
-        }) as SetterFunctions<L>[keyof SetterFunctions<L>];
-      }
-    
-      return setters as SetterFunctions<L>;
-    }, []);
-    
-    const setters = useMemo(() => createSetters(store.current), [createSetters])
+        return setters as SetterFunctions<L>;
+      },
+      [],
+    );
+
+    const setters = useMemo(() => createSetters(store.current), [createSetters]);
 
     const subscribe = useCallback((callback: () => void) => {
       subscribers.current.add(callback);
@@ -77,27 +79,21 @@ export default function createSuperContext<Store extends Record<string, unknown>
       get,
       set,
       subscribe,
-			setters
+      setters,
     };
   }
 
-  type UseStoreDataReturnType = ReturnType<typeof useStoreData>;
+  type UseStoreDataReturnType = ReturnType<typeof useStoreData>
 
   const StoreContext = createContext<UseStoreDataReturnType | null>(null);
 
   function Provider({ children }: { children: React.ReactNode }) {
-    return (
-      <StoreContext.Provider value={useStoreData()}>
-        {children}
-      </StoreContext.Provider>
-    );
+    return <StoreContext.Provider value={useStoreData()}>{children}</StoreContext.Provider>;
   }
 
   function useStore<SelectorOutput>(
-    selector: (store: Store) => SelectorOutput
-  ): [SelectorOutput, SetAction<Store>, 
-    SetterFunctions<Store>
-] {
+    selector: (store: Store) => SelectorOutput,
+  ): [SelectorOutput, SetAction<Store>, SetterFunctions<Store>] {
     const store = useContext(StoreContext);
     if (!store) {
       throw new Error("Store not found");
@@ -109,11 +105,7 @@ export default function createSuperContext<Store extends Record<string, unknown>
       () => selector(initialState),
     );
 
-    return [
-			state,
-			store.set,
-			store.setters
-		];
+    return [state, store.set, store.setters];
   }
 
   return {
