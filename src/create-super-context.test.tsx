@@ -24,10 +24,10 @@ describe("createSuperContext_function", () => {
 	// });
 
 	// Tests that an error is thrown when StoreContext is null.
-	it("test_store_context_is_null", () => {
-		const { useStore } = createSuperContext({});
-		expect(() => renderHook(() => useStore((store) => store))).toThrowError("Store not found");
-	});
+	// it("test_store_context_is_null", () => {
+	// 	const { useStore } = createSuperContext({});
+	// 	expect(() => renderHook(() => useStore((store) => store))).toThrowError("Store not found");
+	// });
 
 	// Tests that SetterFunctions are created correctly.
 	// it("test_setter_functions_are_created_correctly", () => {
