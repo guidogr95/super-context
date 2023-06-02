@@ -1,7 +1,7 @@
 /* eslint-disable check-file/filename-naming-convention */
 
 import createSuperContext from "./create-super-context";
-import { renderHook } from "@testing-library/react";
+// import { renderHook } from "@testing-library/react";
 
 describe("createSuperContext_function", () => {
 
