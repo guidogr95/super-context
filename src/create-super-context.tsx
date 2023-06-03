@@ -17,9 +17,7 @@ type SetterFunctions<L extends Record<string, unknown>> = {
   ) => void
 }
 
-export default function createSuperContext<Store extends Record<string, unknown>>(
-  initialState: Store,
-) {
+export function createSuperContext<Store extends Record<string, unknown>>(initialState: Store) {
   function useStoreData(): {
     get: () => Store
     set: SetAction<Store>

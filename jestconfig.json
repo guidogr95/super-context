@@ -1,8 +1,13 @@
 {
+	"preset": "ts-jest",
   "transform": {
-    "^.+\\.(t|j)sx?$": "ts-jest"
+    "^.+\\.(t|j)sx?$": "ts-jest",
+		"^.+\\.(js|jsx)$": "babel-jest"
   },
   "testRegex": "(/tests/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
   "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
-  "testEnvironment": "jsdom"
+  "testEnvironment": "node",
+	"transformIgnorePatterns": [
+		"node_modules/(?!variables/.*)"
+	]
 }

@@ -5,8 +5,13 @@
     "node_modules"
   ],
   "compilerOptions": {
-    "module": "esnext",
-    "lib": ["dom", "esnext"],
+    "module": "CommonJS",
+    "target": "es6",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "importHelpers": true,
     "declaration": true,
     "sourceMap": true,
@@ -22,5 +27,6 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "allowJs": true
   }
 }
